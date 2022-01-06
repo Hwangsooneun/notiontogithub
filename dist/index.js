@@ -25873,9 +25873,9 @@ var properties;
     function getStatusSelectOption(state) {
         switch (state) {
             case 'open':
-                return select('Open', 'green');
+                return select('Task', 'green');
             case 'closed':
-                return select('Closed', 'red');
+                return select('Completed', 'red');
         }
     }
     properties.getStatusSelectOption = getStatusSelectOption;
@@ -25909,6 +25909,15 @@ var properties;
     properties.url = url;
 })(properties || (properties = {}));
 
+;// CONCATENATED MODULE: ./src/date.dto.ts
+function krDate(date) {
+    const curr = new Date(date);
+    const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000);
+    const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+    const kr_curr = new Date(utc + (KR_TIME_DIFF));
+    return kr_curr.toISOString();
+}
+
 ;// CONCATENATED MODULE: ./src/sync.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25926,6 +25935,7 @@ var __asyncValues = (undefined && undefined.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+
 
 
 function createIssueMapping(notion, databaseId) {
@@ -25991,6 +26001,12 @@ function getGitHubIssues(octokit, githubRepo) {
                 const { data } = iterator_1_1.value;
                 for (const issue of data) {
                     if (!issue.pull_request) {
+                        if (issue.created_at) {
+                            issue.created_at = krDate(issue.created_at);
+                        }
+                        else if (issue.updated_at) {
+                            issue.updated_at = krDate(issue.updated_at);
+                        }
                         issues.push(issue);
                     }
                 }
@@ -26078,6 +26094,7 @@ var action_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 
 
 
+
 function removeHTML(text) {
     var _a;
     return (_a = text === null || text === void 0 ? void 0 : text.replace(/<.*>.*<\/.*>/g, '')) !== null && _a !== void 0 ? _a : '';
@@ -26097,8 +26114,8 @@ function parsePropertiesFromPayload(payload) {
         Milestone: properties.text((_e = (_d = payload.issue.milestone) === null || _d === void 0 ? void 0 : _d.title) !== null && _e !== void 0 ? _e : ''),
         Labels: properties.multiSelect((_g = (_f = payload.issue.labels) === null || _f === void 0 ? void 0 : _f.map(label => label.name)) !== null && _g !== void 0 ? _g : []),
         Author: properties.text(payload.issue.user.login),
-        Created: properties.date(payload.issue.created_at),
-        Updated: properties.date(payload.issue.updated_at),
+        Created: properties.date(krDate(payload.issue.created_at)),
+        Updated: properties.date(krDate(payload.issue.updated_at)),
         ID: properties.number(payload.issue.id),
         Link: properties.url(payload.issue.html_url),
     };

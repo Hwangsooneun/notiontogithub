@@ -5,6 +5,7 @@ import type {WebhookPayload} from '@actions/github/lib/interfaces';
 import {CustomValueMap, properties} from './properties';
 import {createIssueMapping, syncNotionDBWithGitHub} from './sync';
 import {Octokit} from 'octokit';
+import {krDate} from './date.dto';
 
 function removeHTML(text?: string): string {
   return text?.replace(/<.*>.*<\/.*>/g, '') ?? '';
@@ -26,8 +27,8 @@ function parsePropertiesFromPayload(payload: IssuesEvent): CustomValueMap {
     Milestone: properties.text(payload.issue.milestone?.title ?? ''),
     Labels: properties.multiSelect(payload.issue.labels?.map(label => label.name) ?? []),
     Author: properties.text(payload.issue.user.login),
-    Created: properties.date(payload.issue.created_at),
-    Updated: properties.date(payload.issue.updated_at),
+    Created: properties.date(krDate(payload.issue.created_at)),
+    Updated: properties.date(krDate(payload.issue.updated_at)),
     ID: properties.number(payload.issue.id),
     Link: properties.url(payload.issue.html_url),
   };

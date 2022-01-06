@@ -5,6 +5,7 @@ import * as core from '@actions/core';
 import {Octokit} from 'octokit';
 import {CustomValueMap, properties} from './properties';
 import {NumberPropertyValue, Page} from '@notionhq/client/build/src/api-types';
+import {krDate} from './date.dto';
 
 type PageIdAndIssueNumber = {
   pageId: string;
@@ -82,6 +83,11 @@ async function getGitHubIssues(octokit: Octokit, githubRepo: string): Promise<Is
   for await (const {data} of iterator) {
     for (const issue of data) {
       if (!issue.pull_request) {
+        if (issue.created_at) {
+          issue.created_at = krDate(issue.created_at);
+        } else if (issue.updated_at) {
+          issue.updated_at = krDate(issue.updated_at);
+        }
         issues.push(<Issue>issue);
       }
     }

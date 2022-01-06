@@ -91,9 +91,9 @@ export namespace properties {
   export function getStatusSelectOption(state: 'open' | 'closed'): CustomTypes.Select {
     switch (state) {
       case 'open':
-        return select('Open', 'green');
+        return select('Task', 'green');
       case 'closed':
-        return select('Closed', 'red');
+        return select('Completed', 'red');
     }
   }
 
